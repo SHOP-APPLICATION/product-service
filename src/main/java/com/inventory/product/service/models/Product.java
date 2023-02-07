@@ -13,6 +13,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "products")
@@ -27,10 +28,18 @@ public class Product {
     private String description;
     private Unit unit;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="category_id")
+    @JoinColumn(name="category_id" , nullable = false)
     private Category category;
-//    @ManyToMany(mappedBy = "products" , fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    private Set<Supplier> suppliers = new HashSet<>();
+
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.MERGE
+    })
+    @JoinTable(name = "product_supplier",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "supplier_id")
+    )
+    private List<Supplier> suppliers;
     private Status status;
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp

@@ -12,8 +12,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import java.time.LocalDateTime;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "suppliers")
@@ -25,12 +27,8 @@ public class Supplier {
     @Id
     private UUID id = UUID.randomUUID();
     private String name;
-//    @ManyToMany( fetch = FetchType.EAGER)
-//    @JoinTable(name="suppliers_products",
-//            joinColumns = {@JoinColumn(name="supplier_id")},
-//            inverseJoinColumns = {@JoinColumn(name="product_id")})
-//    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-//    private Set<Product> products = new HashSet<>();
+    @ManyToMany(mappedBy = "suppliers")
+    private List<Product> products;
     private Status status;
     @Column(nullable = true)
     private String raison;

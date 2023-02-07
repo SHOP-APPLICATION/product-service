@@ -23,7 +23,7 @@ public class ProductController {
 
     @PostMapping()
     public ResponseEntity<ProductResponseDto> save(@Valid @RequestBody ProductRequestDto requestDTO){
-        log.info("controller Product : start");
+
         return new ResponseEntity<>(productService.addProduct(requestDTO), HttpStatus.CREATED);
     }
 

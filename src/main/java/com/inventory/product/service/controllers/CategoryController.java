@@ -27,15 +27,16 @@ public class CategoryController {
     }
 
     @PostMapping()
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('CATEGORIES')")
     public ResponseEntity<CategoryResponseDTO> save(@Valid @RequestBody CategoryRequestDto requestDTO, Principal principal){
-        log.info("controller category : start");
+
         // access to the user autehnicated
         KeycloakAuthenticationToken keycloakAuthenticationToken = (KeycloakAuthenticationToken) principal;
         AccessToken token = keycloakAuthenticationToken.getAccount().getKeycloakSecurityContext().getToken();
 
         String user = token.getPreferredUsername();
-        log.info(user);
+
+        /* return ResponseEntity.ok(addedCategory);*/
         return new ResponseEntity<>(categoryService.addCategory(requestDTO), HttpStatus.CREATED);
     }
 
@@ -53,23 +54,22 @@ public class CategoryController {
     public ResponseEntity<Object> delete(@PathVariable UUID id) {
         boolean check =  categoryService.deleteCategory(id);
         if(check){
-            return  new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return ResponseEntity.noContent().build();
         }
-        return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> get(@PathVariable UUID id){
         CategoryResponseDTO categoryResponseDTO = categoryService.getCategory(id);
-
         if (categoryResponseDTO == null) {
-            return  new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
         return  new ResponseEntity<>(categoryResponseDTO, HttpStatus.OK);
     }
 
     @GetMapping()
-    @PreAuthorize("hasAuthority('USER')")
-    public List<CategoryResponseDTO> all () {
-        return categoryService.getCategories();
+    @PreAuthorize("hasAuthority('CATEGORIES')")
+    public ResponseEntity<List<CategoryResponseDTO>> getAll () {
+       return  ResponseEntity.ok(categoryService.getCategories());
     }
 }
