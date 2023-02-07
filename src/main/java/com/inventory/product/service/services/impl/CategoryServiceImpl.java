@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,10 +32,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDTO addCategory(CategoryRequestDto categoryRequestDTO) {
-        Category category = categoryMapper.dtoToModel(categoryRequestDTO);
+        Category category = categoryMapper.toEntity(categoryRequestDTO);
         Category categorySaved = categoryRepository.save(category);
-        CategoryResponseDTO categoryResponseDTO = categoryMapper.modelToDto(categorySaved);
-        return categoryResponseDTO;
+        return categoryMapper.toDto(categorySaved);
     }
 
     @Override
@@ -44,31 +44,24 @@ public class CategoryServiceImpl implements CategoryService {
             category.setName(categoryRequestDTO.getName());
             category.setDescription(categoryRequestDTO.getDescription());
             category.setStatus(categoryRequestDTO.getStatus());
-            CategoryResponseDTO categoryResponseDTO = categoryMapper.modelToDto(categoryRepository.save(category));
-            return categoryResponseDTO;
+            category = categoryRepository.save(category);
+            return categoryMapper.toDto(category);
         }
         return null;
     }
 
     @Override
     public CategoryResponseDTO getCategory(UUID id) {
-        Category category = categoryRepository.findById(id).orElse(null);
-        if (category != null && category.getDeletedAt() == null){
-            CategoryResponseDTO categoryResponseDTO = categoryMapper.modelToDto(category);
-            return  categoryResponseDTO;
-        }
-        return null;
+        Optional<Category> category = categoryRepository.findById(id);
+        return category.map(categoryMapper::toDto).orElse(null);
     }
 
     @Override
     public List<CategoryResponseDTO> getCategories() {
-        List<CategoryResponseDTO> categoryResponseDTOS = new ArrayList<>();
-        categoryRepository.findAll().forEach(c -> {
-            if(c.getDeletedAt() == null){
-                categoryResponseDTOS.add(categoryMapper.modelToDto(c));
-            }
-        });
-        return categoryResponseDTOS;
+        List<Category> categories = categoryRepository.findAll();
+        return categories.stream()
+                .map(categoryMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override

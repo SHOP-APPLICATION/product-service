@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -23,5 +24,5 @@ public class ProductResponseDto {
     private Status status;
     private Unit unit;
     private CategoryResponseDTO category;
-//    private Set<Supplier> suppliers = new HashSet<>();
+    private List<SupplierResponseDto> suppliers;
 }
